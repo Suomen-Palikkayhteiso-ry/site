@@ -1,0 +1,35 @@
+/* Base */
+.admin {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1rem;
+  font-family: system-ui, sans-serif;
+}
+
+/* Editor fills available height */
+#cm-editor {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* Build status banners */
+.build-status {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+.build-status.polling  { background: #e8f4fd; color: #0c5ca4; }
+.build-status.live     { background: #d4edda; color: #155724; }
+.build-status.error    { background: #f8d7da; color: #721c24; }
+
+/* Responsive: on small screens stack commit controls vertically */
+@media (max-width: 600px) {
+  #cm-editor .cm-editor {
+    font-size: 12px;
+  }
+  .admin input[type="text"] {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+}

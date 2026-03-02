@@ -1,0 +1,37 @@
+{
+  "containerEnv": {
+    "HOME": "/home/vscode"
+  },
+  "containerUser": "vscode",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "mkhl.direnv",
+        "bbenoist.Nix",
+        "anthropic.claude-code",
+        "jnoortheen.nix-ide",
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
+        "sbrink.elm"
+      ],
+      "settings": {
+        "remote.autoForwardPorts": false
+      }
+    }
+  },
+  "image": "ghcr.io/cachix/devenv/devcontainer:latest",
+  "mounts": [
+    "source=${localEnv:XDG_RUNTIME_DIR}/gnupg/S.gpg-agent,target=/run/host-gpg-agent,type=bind,readonly"
+  ],
+  "overrideCommand": false,
+  "postCreateCommand": "direnv allow",
+  "postStartCommand": "mkdir -p /home/vscode/.gnupg && rm -f /home/vscode/.gnupg/S.gpg-agent && ln -s /run/host-gpg-agent /home/vscode/.gnupg/S.gpg-agent",
+  "remoteEnv": {
+    "GPG_TTY": "/dev/pts/0"
+  },
+  "runArgs": [
+    "--userns=keep-id",
+    "--network=host"
+  ],
+  "updateContentCommand": "devenv shell -- echo Ready."
+}
