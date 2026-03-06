@@ -99,12 +99,18 @@ view _ page _ _ pageView =
 
         _ ->
             { body =
-                [ Html.nav [ Attr.class "bg-white border-b border-gray-200" ]
-                    [ Html.div [ Attr.class "max-w-5xl mx-auto px-6 py-4 flex items-center justify-between" ]
-                        [ Html.a [ Attr.href "/", Attr.class "text-lg font-semibold text-gray-900 hover:text-gray-700 transition-colors" ]
-                            [ Html.text "My Site" ]
-                        , Html.a [ Attr.href "/admin", Attr.class "text-sm text-gray-500 hover:text-gray-900 transition-colors" ]
-                            [ Html.text "Admin" ]
+                [ Html.nav [ Attr.class "bg-brand shadow-sm" ]
+                    [ Html.div [ Attr.class "max-w-5xl mx-auto px-6 py-3 flex items-center justify-between" ]
+                        [ Html.a [ Attr.href "/" ]
+                            [ Html.img
+                                [ Attr.src "https://logo.suomenpalikkayhteiso.fi/logo/horizontal/svg/horizontal-full-dark.svg"
+                                , Attr.alt "Suomen Palikkaharrastajat ry"
+                                , Attr.class "h-9"
+                                ]
+                                []
+                            ]
+                        , Html.a [ Attr.href "/admin", Attr.class "text-sm text-white/70 hover:text-white transition-colors" ]
+                            [ Html.text "Login" ]
                         ]
                     ]
                 , Html.main_ [ Attr.class "max-w-5xl mx-auto px-6 py-10 w-full" ] pageView.body

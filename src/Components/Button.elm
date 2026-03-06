@@ -49,7 +49,7 @@ viewLink config =
 baseClasses : Size -> Variant -> String
 baseClasses size variant =
     String.join " "
-        [ "inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        [ "inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
         , sizeClasses size
         , variantClasses variant
         ]
@@ -72,13 +72,13 @@ variantClasses : Variant -> String
 variantClasses variant =
     case variant of
         Primary ->
-            "bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500"
+            "bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500"
 
         Secondary ->
-            "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-indigo-500"
+            "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-blue-500"
 
         Ghost ->
-            "text-indigo-600 hover:bg-indigo-50 focus:ring-indigo-500"
+            "text-blue-600 hover:bg-blue-50 focus:ring-blue-500"
 
         Danger ->
             "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500"

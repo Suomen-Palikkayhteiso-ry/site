@@ -135,7 +135,7 @@ init :
     -> Shared.Model
     -> ( Model, Effect Msg )
 init app _ =
-    ( { auth = NotLoggedIn
+    ( { auth = PATEntry ""
       , siteMeta = app.data.siteMeta
       , editorState = NoBrowserOpen
       , buildStatus = BuildIdle
@@ -240,7 +240,7 @@ update _ _ msg model =
             ( model, Effect.none )
 
         ClickedLogout ->
-            ( { model | auth = NotLoggedIn }
+            ( { model | auth = PATEntry "" }
             , Effect.fromCmd (clearToken ())
             )
 
@@ -480,7 +480,7 @@ view :
     -> Model
     -> View (PagesMsg Msg)
 view _ _ model =
-    { title = "Admin"
+    { title = "Login"
     , body = [ Html.map PagesMsg.fromMsg (viewBody model) ]
     }
 
@@ -493,16 +493,7 @@ viewBody model =
         , Html.main_ [ Attr.class "flex-1 max-w-5xl mx-auto w-full px-6 py-8" ]
             [ case model.auth of
                 NotLoggedIn ->
-                    viewNotLoggedIn
-
-                RequestingDeviceCode ->
-                    viewCard []
-                        [ Html.p [ Attr.class "text-gray-600" ]
-                            [ Html.text "Requesting device code\u{2026}" ]
-                        ]
-
-                AwaitingUserAuth state ->
-                    viewAwaitingAuth state
+                    viewPATEntry ""
 
                 PATEntry draft ->
                     viewPATEntry draft
@@ -513,22 +504,31 @@ viewBody model =
                 AuthError err ->
                     viewCard []
                         [ Html.p [ Attr.class "text-red-600 mb-4" ] [ Html.text ("Error: " ++ err) ]
-                        , btnPrimary [ Events.onClick ClickedLoginWithGitHub ] "Try again"
+                        , btnSecondary [ Events.onClick ClickedUsePAT ] "Try again"
                         ]
+
+                _ ->
+                    Html.text ""
             ]
         ]
 
 
 viewNav : Model -> Html Msg
 viewNav model =
-    Html.nav [ Attr.class "bg-gray-900 text-white shadow-md" ]
-        [ Html.div [ Attr.class "max-w-5xl mx-auto px-6 py-4 flex items-center justify-between" ]
-            [ Html.span [ Attr.class "text-lg font-semibold tracking-tight" ]
-                [ Html.text "Site Editor" ]
+    Html.nav [ Attr.class "bg-brand shadow-sm" ]
+        [ Html.div [ Attr.class "max-w-5xl mx-auto px-6 py-3 flex items-center justify-between" ]
+            [ Html.a [ Attr.href "/" ]
+                [ Html.img
+                    [ Attr.src "https://logo.suomenpalikkayhteiso.fi/logo/horizontal/svg/horizontal-full-dark.svg"
+                    , Attr.alt "Suomen Palikkaharrastajat ry"
+                    , Attr.class "h-9"
+                    ]
+                    []
+                ]
             , case model.auth of
                 LoggedIn token ->
                     Html.div [ Attr.class "flex items-center gap-4" ]
-                        [ Html.span [ Attr.class "text-sm text-gray-300" ]
+                        [ Html.span [ Attr.class "text-sm text-white/70" ]
                             [ Html.text
                                 (if String.isEmpty token.login then
                                     "Logged in"
@@ -539,7 +539,7 @@ viewNav model =
                             ]
                         , Html.button
                             [ Events.onClick ClickedLogout
-                            , Attr.class "text-sm text-gray-300 hover:text-white underline"
+                            , Attr.class "text-sm text-white/70 hover:text-white underline"
                             ]
                             [ Html.text "Log out" ]
                         ]
@@ -550,48 +550,6 @@ viewNav model =
         ]
 
 
-viewNotLoggedIn : Html Msg
-viewNotLoggedIn =
-    viewCard [ Attr.class "max-w-md mx-auto" ]
-        [ Html.h2 [ Attr.class "text-xl font-semibold text-gray-800 mb-2" ]
-            [ Html.text "Sign in to edit pages" ]
-        , Html.p [ Attr.class "text-gray-500 text-sm mb-6" ]
-            [ Html.text "Authenticate with your GitHub account to browse and edit content." ]
-        , Html.div [ Attr.class "flex flex-col gap-3" ]
-            [ btnPrimary [ Events.onClick ClickedLoginWithGitHub ]
-                "Login with GitHub (device flow)"
-            , Html.div [ Attr.class "flex items-center gap-3" ]
-                [ Html.hr [ Attr.class "flex-1 border-gray-200" ] []
-                , Html.span [ Attr.class "text-xs text-gray-400" ] [ Html.text "or" ]
-                , Html.hr [ Attr.class "flex-1 border-gray-200" ] []
-                ]
-            , btnSecondary [ Events.onClick ClickedUsePAT ]
-                "Use Personal Access Token"
-            ]
-        ]
-
-
-viewAwaitingAuth : DeviceCodeState -> Html Msg
-viewAwaitingAuth state =
-    viewCard [ Attr.class "max-w-md mx-auto" ]
-        [ Html.h2 [ Attr.class "text-xl font-semibold text-gray-800 mb-4" ]
-            [ Html.text "Authorise in GitHub" ]
-        , Html.p [ Attr.class "text-sm text-gray-600 mb-2" ]
-            [ Html.text "1. Open this URL in your browser:" ]
-        , Html.a
-            [ Attr.href state.verificationUri
-            , Attr.target "_blank"
-            , Attr.class "text-blue-600 hover:underline text-sm break-all block mb-4"
-            ]
-            [ Html.text state.verificationUri ]
-        , Html.p [ Attr.class "text-sm text-gray-600 mb-2" ]
-            [ Html.text "2. Enter this code:" ]
-        , Html.div [ Attr.class "bg-gray-100 rounded-lg px-6 py-4 text-center font-mono text-2xl font-bold tracking-widest text-gray-800 mb-4" ]
-            [ Html.text state.userCode ]
-        , Html.p [ Attr.class "text-sm text-gray-500 italic" ]
-            [ Html.text "Waiting for authorisation\u{2026}" ]
-        ]
-
 
 viewPATEntry : String -> Html Msg
 viewPATEntry draft =
@@ -599,7 +557,7 @@ viewPATEntry draft =
         [ Html.h2 [ Attr.class "text-xl font-semibold text-gray-800 mb-2" ]
             [ Html.text "Personal Access Token" ]
         , Html.p [ Attr.class "text-sm text-gray-500 mb-4" ]
-            [ Html.text "Paste a GitHub PAT with " ]
+            [ Html.text "Paste a GitHub Personal Access Token with repo scope." ]
         , Html.div [ Attr.class "flex gap-2" ]
             [ Html.input
                 [ Attr.type_ "password"

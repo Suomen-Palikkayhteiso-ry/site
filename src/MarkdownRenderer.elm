@@ -399,17 +399,17 @@ buttonLinkClass : Maybe String -> String
 buttonLinkClass variant =
     let
         base =
-            "no-underline inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 px-4 py-2 text-sm"
+            "no-underline inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 px-4 py-2 text-sm [&_p]:text-inherit [&_p]:my-0"
     in
     base
         ++ " "
         ++ (case Maybe.withDefault "primary" variant of
                 "secondary" ->
-                    "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-indigo-500"
+                    "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-blue-500"
 
                 "ghost" ->
-                    "text-indigo-600 hover:bg-indigo-50 focus:ring-indigo-500"
+                    "text-blue-600 hover:bg-blue-50 focus:ring-blue-500"
 
                 _ ->
-                    "bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500"
+                    "bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500"
            )
