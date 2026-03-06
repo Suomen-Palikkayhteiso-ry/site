@@ -11,6 +11,7 @@ devenv.local.yaml
 
 # Agents
 TODO.md
+.claude
 
 # elm-pages generated code
 .elm-pages/

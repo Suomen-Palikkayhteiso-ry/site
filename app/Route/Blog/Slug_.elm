@@ -1,10 +1,16 @@
 module Route.Blog.Slug_ exposing (ActionData, Data, Model, Msg, route)
 
 import BackendTask exposing (BackendTask)
+import BackendTask.File as File
+import BackendTask.Glob as Glob
 import FatalError exposing (FatalError)
+import Frontmatter exposing (Frontmatter)
 import Head
 import Head.Seo as Seo
 import Html
+import Html.Attributes as Attr
+import Json.Decode as Decode
+import MarkdownRenderer
 import Pages.Url
 import PagesMsg exposing (PagesMsg)
 import RouteBuilder exposing (App, StatelessRoute)
@@ -24,6 +30,16 @@ type alias RouteParams =
     { slug : String }
 
 
+type alias Data =
+    { frontmatter : Frontmatter
+    , body : String
+    }
+
+
+type alias ActionData =
+    {}
+
+
 route : StatelessRoute RouteParams Data ActionData
 route =
     RouteBuilder.preRender
@@ -36,42 +52,38 @@ route =
 
 pages : BackendTask FatalError (List RouteParams)
 pages =
-    BackendTask.succeed
-        [ { slug = "hello" }
-        ]
-
-
-type alias Data =
-    { something : String
-    }
-
-
-type alias ActionData =
-    {}
+    Glob.succeed (\slug -> { slug = slug })
+        |> Glob.match (Glob.literal "content/blog/")
+        |> Glob.capture Glob.wildcard
+        |> Glob.match (Glob.literal ".md")
+        |> Glob.toBackendTask
 
 
 data : RouteParams -> BackendTask FatalError Data
 data routeParams =
-    BackendTask.map Data
-        (BackendTask.succeed "Hi")
+    File.bodyWithFrontmatter
+        (\body ->
+            Frontmatter.decoder
+                |> Decode.map (\fm -> { frontmatter = fm, body = body })
+        )
+        ("content/blog/" ++ routeParams.slug ++ ".md")
+        |> BackendTask.allowFatal
 
 
-head :
-    App Data ActionData RouteParams
-    -> List Head.Tag
+head : App Data ActionData RouteParams -> List Head.Tag
 head app =
     Seo.summary
         { canonicalUrlOverride = Nothing
-        , siteName = "elm-pages"
+        , siteName = "My Site"
         , image =
-            { url = Pages.Url.external "TODO"
-            , alt = "elm-pages logo"
+            { url = Pages.Url.external ""
+            , alt = ""
             , dimensions = Nothing
             , mimeType = Nothing
             }
-        , description = "TODO"
+        , description = app.data.frontmatter.description
         , locale = Nothing
-        , title = "TODO title" -- metadata.title -- TODO
+        , title = app.data.frontmatter.title
         }
         |> Seo.website
 
@@ -80,7 +92,14 @@ view :
     App Data ActionData RouteParams
     -> Shared.Model
     -> View (PagesMsg Msg)
-view app sharedModel =
-    { title = "Placeholder - Blog.Slug_"
-    , body = [ Html.text "You're on the page Blog.Slug_" ]
+view app _ =
+    { title = app.data.frontmatter.title
+    , body =
+        [ Html.a
+            [ Attr.href "/"
+            , Attr.class "inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900 mb-6 transition-colors"
+            ]
+            [ Html.text "← All pages" ]
+        , MarkdownRenderer.renderMarkdown app.data.body
+        ]
     }

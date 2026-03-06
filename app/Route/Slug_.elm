@@ -7,11 +7,10 @@ import FatalError exposing (FatalError)
 import Frontmatter exposing (Frontmatter)
 import Head
 import Head.Seo as Seo
-import Html exposing (Html)
+import Html
 import Html.Attributes as Attr
 import Json.Decode as Decode
-import Markdown.Parser
-import Markdown.Renderer
+import MarkdownRenderer
 import Pages.Url
 import PagesMsg exposing (PagesMsg)
 import RouteBuilder exposing (App, StatelessRoute)
@@ -99,21 +98,6 @@ view app _ =
     , body =
         [ Html.a [ Attr.href "/", Attr.class "inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900 mb-6 transition-colors" ]
             [ Html.text "← All pages" ]
-        , renderMarkdown app.data.body
+        , MarkdownRenderer.renderMarkdown app.data.body
         ]
     }
-
-
-renderMarkdown : String -> Html (PagesMsg Msg)
-renderMarkdown markdown =
-    case
-        markdown
-            |> Markdown.Parser.parse
-            |> Result.mapError (List.map Markdown.Parser.deadEndToString >> String.join "\n")
-            |> Result.andThen (Markdown.Renderer.render Markdown.Renderer.defaultHtmlRenderer)
-    of
-        Ok rendered ->
-            Html.article [ Attr.class "prose prose-gray max-w-none" ] rendered
-
-        Err err ->
-            Html.pre [ Attr.class "text-red-600 text-sm" ] [ Html.text err ]
